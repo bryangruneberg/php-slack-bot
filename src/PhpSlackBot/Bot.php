@@ -196,7 +196,7 @@ class Bot
         }
     }
 
-    private function init(\Zend\Log\LoggerInterface $logger = null)
+    private function init()
     {
         $url = 'https://slack.com/api/rtm.start';
         $ch = curl_init();
@@ -217,7 +217,7 @@ class Bot
         }
         $this->wsUrl = $response['url'];
 
-        if (is_null($logger)) {
+        if (is_null($this->logger)) {
             $this->initLogger();
         }
     }
@@ -270,6 +270,10 @@ class Bot
 
         foreach ($this->commands as $commandName => $availableCommand) {
             $find = '/^'.preg_quote($commandName).'/';
+            if ($availableCommand->getCaseInsensitive()) {
+                $find .= 'i';
+            }
+
             if (preg_match($find, $text) &&
                 (!$availableCommand->getMentionOnly() || $botMention)) {
                 return $availableCommand;
